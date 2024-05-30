@@ -6,7 +6,7 @@ class Queue : private List {
 public:
     void enqueue(int n);
     int dequeue();
-    void empty() const;
+    bool empty() const;
 };
 
 #endif
