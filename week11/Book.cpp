@@ -11,7 +11,7 @@ Book& Book::operator++()
     return *this;
 }
 
-Book Book::operator++(int)
+Book& Book::operator++(int)
 {
     Book tmp = *this;
     price += price * 0.1;

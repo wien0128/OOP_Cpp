@@ -36,7 +36,7 @@ public:
         return title.compare(op2) ? false : true;
     }
 
-    bool operator==(Book op2)
+    bool operator==(Book& op2)
     {
         if (title == op2.title && price == op2.price && pages == op2.pages)
             return true;

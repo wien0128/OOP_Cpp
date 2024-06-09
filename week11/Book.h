@@ -29,7 +29,7 @@ public:
 
     bool operator!();
     Book& operator++();
-    Book operator++(int);
+    Book& operator++(int);
     friend ostream& operator<<(ostream& op1, Book op2);
 };
 
