@@ -25,13 +25,13 @@ public:
         return title;
     }
 
-    Book operator+=(int op2)
+    Book& operator+=(int op2)
     {
         price = price + op2;
         return *this;
     }
 
-    Book operator-=(int op2)
+    Book& operator-=(int op2)
     {
         price = price - op2;
         return *this;
