@@ -23,11 +23,11 @@ void Family::show() const
 	cout << name << "가족은 다음과 같이 3명입니다.\n";
 	for (int i = 0; i < size; i++)
 	{
-        if (size - i != 1)
-        {
-            cout << p[i].getName() << ", ";
-        }
-		cout << p[i].getName();
+        cout << p[i].getName();
+		if (i != (3 - 1))
+		{
+			cout << ", ";
+		}
 	}
 	cout << "\n";
 }
