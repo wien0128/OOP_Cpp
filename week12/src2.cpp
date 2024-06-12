@@ -46,12 +46,14 @@ int main()
 {
     const int NUM_OF_PIZZA = 5;
     NamedCircle pizza[NUM_OF_PIZZA];
+    NamedCircle maxPizza;
 
     cout << "5개의 피자 반지름과 피자 이름을 입력하세요.\n";
     for (int i = 0; i < NUM_OF_PIZZA; ++i)
     {
         cout << i + 1 << " >> "; 
         cin >> pizza[i];
+        maxPizza = (pizza[i].getArea() > maxPizza.getArea()) ? pizza[i] : maxPizza; 
     }
     
     NamedCircle* largestPizza = &pizza[0];
@@ -64,6 +66,7 @@ int main()
     }
     
     cout << "가장 면적이 큰 피자는 " << largestPizza->getName() << "입니다\n";
+    cout << "가장 면적이 큰 피자는 " << maxPizza.getName() << "입니다\n";
 
     return 0;
 }
