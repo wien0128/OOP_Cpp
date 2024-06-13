@@ -44,42 +44,125 @@ public:
       - ostream &operator<<
     */
     // Vector의 첫번째 요소에 대한 포인터 반환
-    T *begin();
-
-    const T *begin() const;
+    T *begin() { return _memory; }
+    const T *begin() const { return _memory; }
 
     // Vector의 마지막 다음 요소에 대한 포인터 반환
-    T *end();
-
-    const T *end() const;
+    T *end() { return _memory + _size; }
+    const T *end() const { return _memory + _size; }
 
     // Vector의 index 위치의 값을 반환하는 연산자를 정의할 것
-    T &operator[](unsigned index);             // 비 const 버전
-    const T &operator[](unsigned index) const; // const 버전
+    T &operator[](unsigned index) { return _memory[index]; }            // 비 const 버전
+    const T &operator[](unsigned index) const { return _memory[index]; } // const 버전
 
     // vector1 = vector2 수행 시 vector1의 내용을 vector2로 변경하는 연산자를
     // 정의할 것
-    Vector<T> &operator=(const Vector<T> &vector);
+    Vector<T> &operator=(const Vector<T> &vector) {
+        if (this != &vector)
+        {
+            delete[] _memory;
+            _size = vector._size;
+            _capacity = vector._capacity;
+            _memory = new T[_capacity];
+
+            for (unsigned i = 0; i < _size; ++i)
+            {
+                _memory[i] = vector._memory[i];
+            }
+        }
+        return *this;
+    }
 
     // vector1 + vector2 수행시 두 벡터가 연결된 새로운 벡터를 리턴하는 연산자를
     // 정의할 것
-    Vector<T> operator+(const Vector<T> &vector) const;
+    Vector<T> operator+(const Vector<T> &vector) const {
+        Vector<T> res(_size + vector._size);
+        for (unsigned i = 0; i < _size; ++i)
+        {
+            res._memory[i] = _memory[i];
+        }
+        for (unsigned i = 0; i < vector._size; ++i)
+        {
+            res._memory[_size + i] = vector._memory[i];
+        }
+        res._size = _size + vector._size;
+
+        return res;
+    }
 
     // vector1 += vector2 수행 시 vector1 뒤에 vector2 연결되는 연산자를 정의할 것
-    Vector<T> &operator+=(const Vector<T> &vector);
+    Vector<T> &operator+=(const Vector<T> &vector) {
+        unsigned new_size = _size + vector._size;
+        if (new_size > _capacity)
+        {
+            reallocate(new_size);
+        }
+        for (unsigned i = 0; i < vector._size; ++i)
+        {
+            _memory[_size + i] = vector._memory[i];
+        }
+        _size = new_size;
+
+        return *this;
+    }
 
     // vector1 == vector2 수행 시 vector1과 vector2의 모든 값이 같은지 아닌지를
     // 판별하는 연산자를 정의할 것
-    bool operator==(const Vector<T> &vector) const;
+    bool operator==(const Vector<T> &vector) const {
+        if (_size != vector._size)
+        {
+            return false;
+        }
+        for (unsigned i = 0; i < _size; ++i)
+        {
+            if (_memory[i] != vector._memory[i])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 
     // vector1 != vector2 수행 시 vector1과 vector2의 값들 중 하나라도 다르면
     // true, 그렇지 않으면 false를 리턴하는 연산자를 정의할 것
-    bool operator!=(const Vector<T> &vector) const;
+    bool operator!=(const Vector<T> &vector) const {
+        return !(*this == vector);
+    }
+
+    // vector1 > vector2
+    bool operator>(const Vector<T>& vector) const {
+        for (unsigned i = 0; i < _size && i < vector._size; ++i)
+        {
+            if (_memory[i] > vector._memory[i]) return true;
+            if (_memory[i] < vector._memory[i]) return false;
+        }
+        return _size > vector._size;
+    }
+
+    // vector1 >= vector
+    bool operator>=(const Vector<T>& vector) const {
+        return *this > vector || *this == vector;
+    }
+
+    // vector1 < vector2
+    bool operator<(const Vector<T>& vector) const {
+        return !(*this >= vector);
+    }
+
+    // vector1 <= vector2
+    bool operator<=(const Vector<T>& vector) const {
+        return !(*this > vector);
+    }
 
     // 출력 스트림으로 vector를 출력하는 프렌드 함수를 정의할 것
     friend std::ostream &operator<<(std::ostream &out, const Vector<T> &vector) {
         // 템플릿 클래스의 경우는 프렌드 함수를 여기에 정의해야 함
         // 만약 벡터에 <1, 2, 3, 4, 5>가 저장되어 있을 경우. 출력 형식은 [ 1, 2, 3, 4, 5 ]
+        for (unsigned i = 0; i < vector._size; ++i)
+        {
+            out << vector._memory[i] << " ";
+        }
+        return out;
     }
 
 private:
