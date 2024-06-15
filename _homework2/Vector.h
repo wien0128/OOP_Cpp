@@ -27,21 +27,21 @@ public:
     void insert(unsigned index, const T &element);
 
     /*
-      과제 구현 내용
-      아래의 멤버 함수 및 연산자에 대한 코드를 구현하여라.
-      - begin()
-      - end()
-      - operator[]
-      - operator+
-      - operator=
-      - operator+=
-      - operator==
-      - operator!=
-      - operator>
-      - operator>=
-      - operator<
-      - operator<=
-      - ostream &operator<<
+        과제 구현 내용
+        아래의 멤버 함수 및 연산자에 대한 코드를 구현하여라.
+        - begin()
+        - end()
+        - operator[]
+        - operator+
+        - operator=
+        - operator+=
+        - operator==
+        - operator!=
+        - operator>
+        - operator>=
+        - operator<
+        - operator<=
+        - ostream &operator<<
     */
     // Vector의 첫번째 요소에 대한 포인터 반환
     T *begin() { return _memory; }
@@ -158,10 +158,16 @@ public:
     friend std::ostream &operator<<(std::ostream &out, const Vector<T> &vector) {
         // 템플릿 클래스의 경우는 프렌드 함수를 여기에 정의해야 함
         // 만약 벡터에 <1, 2, 3, 4, 5>가 저장되어 있을 경우. 출력 형식은 [ 1, 2, 3, 4, 5 ]
+        out << "[ ";
         for (unsigned i = 0; i < vector._size; ++i)
         {
-            out << vector._memory[i] << " ";
+            out << vector._memory[i];
+            if (i < vector._size - 1)
+                out << ", ";
+            else
+                out << "";
         }
+        out << " ]";
         return out;
     }
 

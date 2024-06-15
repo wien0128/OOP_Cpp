@@ -293,7 +293,7 @@ bool String::operator==(const String& str) const        // str2가 String 경우
 }
 bool String::operator==(const char* str) const          // str2가 const char* 경우
 {
-    String tmp(str);
+    String tmp(str);    // char* -> String
     unsigned i{ 0 };
     while (this->memory[i] != '\0' && str[i] != '\0')
     {
@@ -468,7 +468,6 @@ std::ostream& operator<<(std::ostream& out, const String& str)
     out << str.memory;
     return out;
 }
-
 
 void String::check_index(unsigned index) const {
     if (index < this->length()) return;
