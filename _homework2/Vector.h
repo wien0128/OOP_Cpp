@@ -44,19 +44,20 @@ public:
         - ostream &operator<<
     */
     // Vector의 첫번째 요소에 대한 포인터 반환
-    T *begin() { return _memory; }
-    const T *begin() const { return _memory; }
+    T *begin() { return _memory; } // 비 const 버전
+    const T *begin() const { return _memory; } // const 버전
 
     // Vector의 마지막 다음 요소에 대한 포인터 반환
-    T *end() { return _memory + _size; }
-    const T *end() const { return _memory + _size; }
+    T *end() { return _memory + _size; } // 비 const 버전
+    const T *end() const { return _memory + _size; } // const 버전
 
     // Vector의 index 위치의 값을 반환하는 연산자를 정의할 것
-    T &operator[](unsigned index) { return _memory[index]; }             // 비 const 버전
+    T &operator[](unsigned index) { return _memory[index]; } // 비 const 버전
     const T &operator[](unsigned index) const { return _memory[index]; } // const 버전
 
     // vector1 = vector2 수행 시 vector1의 내용을 vector2로 변경하는 연산자를 정의할 것
-    Vector<T> &operator=(const Vector<T> &vector) {
+    Vector<T> &operator=(const Vector<T>& vector) {
+        // 동일성 체크
         if (this != &vector)
         {
             reallocate(vector._size);
@@ -72,27 +73,17 @@ public:
     }
 
     // vector1 + vector2 수행시 두 벡터가 연결된 새로운 벡터를 리턴하는 연산자를 정의할 것
-    Vector<T> operator+(const Vector<T> &vector) const {
-        Vector<T> res(_size + vector._size);
-        for (unsigned i = 0; i < _size; ++i)
-        {
-            res._memory[i] = _memory[i];
-        }
-        for (unsigned i = 0; i < vector._size; ++i)
-        {
-            res._memory[_size + i] = vector._memory[i];
-        }
-        res._size = _size + vector._size;
+    Vector<T> operator+(const Vector<T>& vector) const {
+        Vector<T> res(*this);
+        res += vector;
 
         return res;
     }
 
     // vector1 += vector2 수행 시 vector1 뒤에 vector2 연결되는 연산자를 정의할 것
-    Vector<T> &operator+=(const Vector<T> &vector) {
-        if (_size + vector._size > _capacity)
-        {
-            reallocate(_size + vector._size);
-        }
+    Vector<T> &operator+=(const Vector<T>& vector) {
+        reallocate(_size + vector._size);
+        
         for (unsigned i = 0; i < vector._size; ++i)
         {
             _memory[_size + i] = vector._memory[i];
@@ -104,11 +95,13 @@ public:
 
     // vector1 == vector2 수행 시 vector1과 vector2의 모든 값이 같은지 아닌지를
     // 판별하는 연산자를 정의할 것
-    bool operator==(const Vector<T> &vector) const {
+    bool operator==(const Vector<T>& vector) const {
+        // 길이가 다를 시 false
         if (_size != vector._size)
         {
             return false;
         }
+        // 동등성 체크
         for (unsigned i = 0; i < _size; ++i)
         {
             if (_memory[i] != vector._memory[i])
@@ -121,7 +114,7 @@ public:
 
     // vector1 != vector2 수행 시 vector1과 vector2의 값들 중 하나라도 다르면
     // true, 그렇지 않으면 false를 리턴하는 연산자를 정의할 것
-    bool operator!=(const Vector<T> &vector) const {
+    bool operator!=(const Vector<T>& vector) const {
         return !(*this == vector);
     }
 
@@ -158,10 +151,11 @@ public:
         for (unsigned i = 0; i < vector._size; ++i)
         {
             out << vector._memory[i];
-            if (i < vector._size - 1)
-                out << ", ";
+            // vector 끝에서 2번째 문자 까지만 쉼표 출력
+            if (i < vector._size - 1) out << ", ";
         }
         out << " ]";
+
         return out;
     }
 

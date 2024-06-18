@@ -130,91 +130,52 @@ String String::toupper() const {
 // index 위치의 문자를 리턴하는 연산자 []
 const char& String::operator[](unsigned index) const    // const
 {
-    this->check_index(index);
+    this->check_index(index);   // out-of-range 체크
     return this->memory[index];
 }
 char& String::operator[](unsigned index)                // non-const
 {
-    this->check_index(index);
+    this->check_index(index);   // out-of-range 체크
     return this->memory[index];
 }
 
 // str1 + str2를 수행하면 두 문자열을 연결한 새로운 String 객체를 리턴하는 연산자 +
 String String::operator+(const String& str) const       // str2가 String 경우
 {
-    // 새로운 String 객체 생성
-    unsigned newCapacity = this->length() + str.length() + 1;
+    // str1의 길이 + str2의 길이 + 1('\0')
+    unsigned newCapacity{ this->length() + str.length() + 1 };
     String newStr(newCapacity);
     
     // str1의 문자열 복사
-    unsigned i{ 0 };
-    while (this->memory[i] != '\0')
-    {
-        newStr.memory[i] = this->memory[i];
-        ++i;
-    }
-
+    strcpy(newStr.memory, this->memory);
     // str2의 문자열 이어 붙이기
-    unsigned j{ 0 };
-    while (str.memory[j] != '\0')
-    {
-        newStr.memory[i++] = str.memory[j++];
-    }
-    newStr.memory[i] = '\0';    // 문자열 끝 표시
+    strcat(newStr.memory, str.memory);
 
     return newStr;
 }
 String String::operator+(const char* str) const         // str2가 const char* 경우
 {
-    unsigned strLength{ 0 };
-    while (str[strLength] != '\0')
-    {
-        ++strLength;
-    }
-    
-    unsigned newCapacity = this->length() + strLength + 1;
+    // str1의 길이 + str2의 길이 + 1('\0')
+    unsigned newCapacity{ this->length() + (unsigned int)strlen(str) + 1 };
     String newStr(newCapacity);
 
-    unsigned i{ 0 };
-    while (this->memory[i] != '\0')
-    {
-        newStr.memory[i] = this->memory[i];
-        ++i;
-    }
-
-    unsigned j{ 0 };
-    while (str[j] != '\0')
-    {
-        newStr.memory[i++] = str[j++];
-    }
-    newStr.memory[i] = '\0';
+    // str1의 문자열 복사
+    strcpy(newStr.memory, this->memory);
+    // str2의 문자열 이어 붙이기
+    strcat(newStr.memory, str);
     
     return newStr;
 }
 String operator+(const char* str1, const String& str2)  // lvalue가 const char* 경우
 {
-    unsigned str1Length{ 0 };
-    while (str1[str1Length] != '\0')
-    {
-        ++str1Length;
-    }
-    
-    unsigned newCapacity = str1Length + str2.length() + 1;
+    // str1의 길이 + str2의 길이 + 1('\0')
+    unsigned newCapacity{ (unsigned int)strlen(str1) + str2.length() + 1 };
     String newStr(newCapacity);
 
-    unsigned i{ 0 };
-    while (str1[i] != '\0')
-    {
-        newStr.memory[i] = str1[i];
-        ++i;
-    }
-    
-    unsigned j{ 0 };
-    while (str2.memory[j] != '\0')
-    {
-        newStr.memory[i++] = str2.memory[j++];
-    }
-    newStr.memory[i] = '\0';
+    // str1의 문자열 복사
+    strcpy(newStr.memory, str1);
+    // str2의 문자열 이어 붙이기
+    strcat(newStr.memory, str2.memory);
     
     return newStr;
 }
@@ -224,39 +185,33 @@ String& String::operator=(const String& str)            // str2가 String 경우
 {
     if (this != &str)
     {
-        unsigned newLength = str.length();
+        unsigned newLength{ str.length() };
+        // str의 길이가 더 길면 메모리 재할당
         if (newLength + 1 > this->capacity)
         {
             delete[] this->memory;
             this->capacity = newLength + 1;
             this->memory = allocate(this->capacity);
         }
-        for (unsigned i = 0; i <= newLength; ++i)
-        {
-            this->memory[i] = str.memory[i];
-        }
+        // str 복사
+        strcpy(this->memory, str.memory);
     }
+
     return *this;
 }
 String& String::operator=(const char* str)              // str2가 const char* 경우
 {
-    unsigned strLength{ 0 };
-    while (str[strLength] != '\0')
-    {
-        ++strLength;
-    }
-    
+    unsigned strLength{ (unsigned int)strlen(str) };
+
+    // str의 길이가 더 길면 메모리 재할당
     if (strLength + 1 > this->capacity)
     {
         delete[] this->memory;
         this->capacity = strLength + 1;
         this->memory = allocate(this->capacity);
     }
-    
-    for (unsigned i = 0; i <= strLength; ++i)
-    {
-        this->memory[i] = str[i];
-    }
+    // 문자열 복사
+    strcpy(this->memory, str);
     
     return *this;
 }
@@ -276,34 +231,14 @@ String& String::operator+=(const char* str)             // str2가 const char* �
 // str1 == str2를 수행하면 두 문자열이 일치할 때 true, 아니면 false 리턴하는 비교연산자 == (대소문자 무시)
 bool String::operator==(const String& str) const        // str2가 String 경우
 {
-    if (this->length() != str.length())
-    {
-        return false;
-    }
-
-    for (unsigned i = 0; this->memory[i] != '\0'; ++i)
-    {
-        if (this->tolower().memory[i] != str.tolower().memory[i])
-        {
-            return false;
-        }
-    }
-    
-    return true;
+    // str1 == str2인 경우 0 반환
+    return strcmp(this->tolower().memory, str.tolower().memory) == 0;
 }
 bool String::operator==(const char* str) const          // str2가 const char* 경우
 {
-    String tmp(str);    // char* -> String
-    unsigned i{ 0 };
-    while (this->memory[i] != '\0' && str[i] != '\0')
-    {
-        if (this->tolower().memory[i] != tmp.tolower().memory[i])
-        {
-            return false;
-        }
-        ++i;
-    }
-    return this->memory[i] == '\0' && str[i] == '\0';
+    // char* -> String
+    String tmp(str);
+    return *this == tmp;
 }
 bool operator==(const char* str1, const String& str2)   // lvalue가 const char* 경우
 {
@@ -327,56 +262,20 @@ bool operator!=(const char* str1, const String& str2)   // lvalue가 const char*
 // str1 > str2를 수행하면 str1이 사전순으로 str2보다 뒤에 나오는 경우 true, 아니면 false를 리턴하는 비교연산자 > (대소문자 무시)
 bool String::operator>(const String& str) const         // str2가 String 경우
 {
-    unsigned i{ 0 };
-    while (this->memory[i] != '\0' && str.memory[i] != '\0')
-    {
-        if (this->tolower().memory[i] > str.tolower().memory[i])
-        {
-            return true;
-        }
-        else if (this->tolower().memory[i] < str.tolower().memory[i])
-        {
-            return false;
-        }
-        ++i;
-    }
-    return this->memory[i] != '\0';
+    // str1 > str2인 경우 양수(1) 반환
+    return strcmp(this->tolower().memory, str.tolower().memory) > 0;
 }
 bool String::operator>(const char* str) const           // str2가 const char* 경우
 {
+    // char* -> String
     String tmp(str);
-    unsigned i{ 0 };
-    while (this->memory[i] != '\0' && str[i] != '\0')
-    {
-        if (this->tolower().memory[i] > tmp.tolower().memory[i])
-        {
-            return true;
-        }
-        else if (this->tolower().memory[i] < tmp.tolower().memory[i])
-        {
-            return false;
-        }
-        ++i;
-    }
-    return this->memory[i] != '\0';
+    return *this > tmp;
 }
 bool operator>(const char* str1, const String& str2)    // lvalue가 const char* 경우
 {
+    // char* -> String
     String tmp(str1);
-    unsigned i{ 0 };
-    while (str1[i] != '\0' && str2.memory[i] != '\0')
-    {
-        if (tmp.tolower().memory[i] > str2.tolower().memory[i])
-        {
-            return true;
-        }
-        else if (tmp.tolower().memory[i] < str2.tolower().memory[i])
-        {
-            return false;
-        }
-        ++i;
-    }
-    return str1[i] != '\0';
+    return tmp > str2;
 }
 
 // str1 >= str2를 수행하면 str1이 사전순으로 str2보다 같거나 뒤에 나오는 경우 true, 아니면 false를 리턴하는 비교연산자 >= (대소문자 무시)
@@ -396,56 +295,20 @@ bool operator>=(const char* str1, const String& str2)    // lvalue가 const char
 // str1 > str2를 수행하면 str1이 사전순으로 str2보다 앞에 나오는 경우 true, 아니면 false를 리턴하는 비교연산자 > (대소문자 무시)
 bool String::operator<(const String& str) const         // str2가 String 경우
 {
-    unsigned i{ 0 };
-    while (this->memory[i] != '\0' && str.memory[i] != '\0')
-    {
-        if (this->tolower().memory[i] < str.tolower().memory[i])
-        {
-            return true;
-        }
-        else if (this->tolower().memory[i] > str.tolower().memory[i])
-        {
-            return false;
-        }
-        ++i;
-    }
-    return str.memory[i] != '\0';
+    // str1 < str2인 경우 음수(-1) 반환
+    return strcmp(this->tolower().memory, str.tolower().memory) < 0;
 }
 bool String::operator<(const char* str) const           // str2가 const char* 경우
 {
+    // char* -> String
     String tmp(str);
-    unsigned i{ 0 };
-    while (this->memory[i] != '\0' && str[i] != '\0')
-    {
-        if (this->tolower().memory[i] < tmp.tolower().memory[i])
-        {
-            return true;
-        }
-        else if (this->tolower().memory[i] > tmp.tolower().memory[i])
-        {
-            return false;
-        }
-        ++i;
-    }
-    return str[i] != '\0';
+    return *this < tmp;
 }
 bool operator<(const char* str1, const String& str2)    // lvalue가 const char* 경우
 {
+    // char* -> String
     String tmp(str1);
-    unsigned i{ 0 };
-    while (str1[i] != '\0' && str2.memory[i] != '\0')
-    {
-        if (tmp.tolower().memory[i] < str2.tolower().memory[i])
-        {
-            return true;
-        }
-        else if (tmp.tolower().memory[i] > str2.tolower().memory[i])
-        {
-            return false;
-        }
-        ++i;
-    }
-    return str2.memory[i] != '\0';
+    return tmp < str2;
 }
 
 // str1 >= str2를 수행하면 str1이 사전순으로 str2보다 같거나 앞에 나오는 경우 true, 아니면 false를 리턴하는 비교연산자 >= (대소문자 무시)
