@@ -127,27 +127,28 @@ String String::toupper() const {
     - ostream &operator<<
 */
 
-const char& String::operator[](unsigned index) const {
-    this->check_index(index);
+// index 위치의 문자를 리턴하는 연산자 []
+const char& String::operator[](unsigned index) const {          // const 리턴
+    this->check_index(index);       // out-of-range 검사
+    return this->memory[index];
+}
+char& String::operator[](unsigned index) {                      // non-const 리턴
+    this->check_index(index);       // out-of-range 검사
     return this->memory[index];
 }
 
-char& String::operator[](unsigned index) {
-    this->check_index(index);
-    return this->memory[index];
-}
-
-String String::operator+(const String& str) const {
+// str1 + str2를 수행하면 두 문자열을 연결한 새로운 String 객체 리턴하는 +
+String String::operator+(const String& str) const {             // String + String
+    // 새 String 크기 계산
     unsigned newCapacity = this->length() + str.length() + 1;
     String newStr(newCapacity);
 
-    strcpy(newStr.memory, this->memory);
-    strcat(newStr.memory, str.memory);
+    strcpy(newStr.memory, this->memory);    // 기존 문자열 복사
+    strcat(newStr.memory, str.memory);      // str 이어 붙이기
 
     return newStr;
 }
-
-String String::operator+(const char* str) const {
+String String::operator+(const char* str) const {               // String + char*
     unsigned strLength = strlen(str);
     unsigned newCapacity = this->length() + strLength + 1;
     String newStr(newCapacity);
@@ -157,8 +158,7 @@ String String::operator+(const char* str) const {
 
     return newStr;
 }
-
-String operator+(const char* str1, const String& str2) {
+String operator+(const char* str1, const String& str2) {        // char* + String
     unsigned str1Length = strlen(str1);
     unsigned newCapacity = str1Length + str2.length() + 1;
     String newStr(newCapacity);
@@ -169,100 +169,114 @@ String operator+(const char* str1, const String& str2) {
     return newStr;
 }
 
-String& String::operator=(const String& str) {
-    if (this != &str) {
+// str1 = str2를 수행하면 str1의 내용이 str2의 내용으로 변경되는 대입연산자 =
+String& String::operator=(const String& str) {                  // String = String
+    // 동일성 체크
+    if (this != &str) 
+    {
         this->set(str.memory);
     }
     return *this;
 }
-
-String& String::operator=(const char* str) {
-    this->set(str);
+String& String::operator=(const char* str) {                    // String = char*
+    // 동일성 체크
+    if (this->memory != str)
+    {
+        this->set(str);
+    }
     return *this;
 }
 
-String& String::operator+=(const String& str) {
+// str1 += str2를 수행하면 str1의 문자열 뒤에 str2의 문자열이 연결되는 대입연산자 +
+String& String::operator+=(const String& str) {                 // String += String
+    *this = *this + str;
+    return *this;
+}
+String& String::operator+=(const char* str) {                   // String += char*
     *this = *this + str;
     return *this;
 }
 
-String& String::operator+=(const char* str) {
-    *this = *this + str;
-    return *this;
-}
-
-bool String::operator==(const String& str) const {
+// str1 == str2를 수행하면 두 문자열이 
+// 일치할 때 true, 아니면 false를 리턴하는 비교연산자 ==
+// (대소문자 무시)
+bool String::operator==(const String& str) const {              // String == String
     return strcmp(this->memory, str.memory) == 0;
 }
-
-bool String::operator==(const char* str) const {
+bool String::operator==(const char* str) const {                // String == char*
     return strcmp(this->memory, str) == 0;
 }
-
-bool operator==(const char* str1, const String& str2) {
+bool operator==(const char* str1, const String& str2) {         // char* == String
     return strcmp(str1, str2.memory) == 0;
 }
 
-bool String::operator!=(const String& str) const {
+// str1 != str2를 수행하면 두 문자열이 
+// 다를 때 true, 아니면 false를 리턴하는 비교연산자 !=
+// (대소문자 무시)
+bool String::operator!=(const String& str) const {              // String != String
     return !(*this == str);
 }
-
-bool String::operator!=(const char* str) const {
+bool String::operator!=(const char* str) const {                // String != char*
     return !(*this == str);
 }
-
-bool operator!=(const char* str1, const String& str2) {
+bool operator!=(const char* str1, const String& str2) {         // char* != String
     return !(str1 == str2);
 }
 
-bool String::operator>(const String& str) const {
+// str1 > str2를 수행하면 str1이 사전순으로 str2보다 
+// 뒤에 나오는 경우 true, 아니면 false를 리턴하는 비교연산자 >
+// (대소문자 무시)
+bool String::operator>(const String& str) const {               // String > String
     return strcmp(this->memory, str.memory) > 0;
 }
-
-bool String::operator>(const char* str) const {
+bool String::operator>(const char* str) const {                 // String > char*
     return strcmp(this->memory, str) > 0;
 }
-
-bool operator>(const char* str1, const String& str2) {
+bool operator>(const char* str1, const String& str2) {          // char* > String
     return strcmp(str1, str2.memory) > 0;
 }
 
-bool String::operator>=(const String& str) const {
+// str1 >= str2를 수행하면 str1이 사전순으로 str2와
+// 같거나 뒤에 나오는 경우 true, 아니면 false를 리턴하는 비교연산자 >=
+// (대소문자 무시)
+bool String::operator>=(const String& str) const {              // String >= String
     return strcmp(this->memory, str.memory) >= 0;
 }
-
-bool String::operator>=(const char* str) const {
+bool String::operator>=(const char* str) const {                // String >= char*
     return strcmp(this->memory, str) >= 0;
 }
-
-bool operator>=(const char* str1, const String& str2) {
+bool operator>=(const char* str1, const String& str2) {         // char* >= String
     return strcmp(str1, str2.memory) >= 0;
 }
 
-bool String::operator<(const String& str) const {
+// str1 < str2를 수행하면 str1이 사전순으로 str2보다
+// 앞에 나오는 경우 true, 아니면 false를 리턴하는 비교연산자 <
+// (대소문자 무시)
+bool String::operator<(const String& str) const {               // String < String
     return strcmp(this->memory, str.memory) < 0;
 }
-
-bool String::operator<(const char* str) const {
+bool String::operator<(const char* str) const {                 // String < char*
     return strcmp(this->memory, str) < 0;
 }
-
-bool operator<(const char* str1, const String& str2) {
+bool operator<(const char* str1, const String& str2) {          // char* < String
     return strcmp(str1, str2.memory) < 0;
 }
 
-bool String::operator<=(const String& str) const {
+// str1 <= str2를 수행하면 str1이 사전순으로 str2와
+// 같거나 앞에 나오는 경우 true, 아니면 false를 리턴하는 비교연산자 <=
+// (대소문자 무시)
+bool String::operator<=(const String& str) const {              // String <= String
     return strcmp(this->memory, str.memory) <= 0;
 }
-
-bool String::operator<=(const char* str) const {
+bool String::operator<=(const char* str) const {                // String <= char*
     return strcmp(this->memory, str) <= 0;
 }
-
-bool operator<=(const char* str1, const String& str2) {
+bool operator<=(const char* str1, const String& str2) {         // char* <= String
     return strcmp(str1, str2.memory) <= 0;
 }
 
+// out << str을 수행 시 ostream 객체로 문자열을 출력하는 연산자 <<
+// (프렌드 함수, 대소문자 무시)
 std::ostream& operator<<(std::ostream& out, const String& str) {
     out << str.memory;
     return out;
