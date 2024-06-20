@@ -60,10 +60,11 @@ public:
         // 동일성 체크
         if (this != &vector)
         {
-            delete[] _memory;               // 기존 메모리 해제
-            _size = vector._size;
-            _capacity = vector._capacity;
-            _memory = new T[_capacity];     // 새 메모리 할당
+            if (vector._size > _capacity)   // vector2의 크기가 더 클 시
+            {
+                reallocate(vector._size);   // 메모리 재할당
+            }
+            _size = vector._size;           // 크기 재할당
             
             // vector1 <- vector2 내용 복사
             for (unsigned i = 0; i < _size; ++i)
