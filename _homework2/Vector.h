@@ -57,13 +57,15 @@ public:
 
     // vector1 = vector2 수행 시 vector1의 내용을 vector2로 변경하는 =
     Vector<T> &operator=(const Vector<T> &vector) {
+        // 동일성 체크
         if (this != &vector)
         {
-            delete[] _memory;
+            delete[] _memory;               // 기존 메모리 해제
             _size = vector._size;
             _capacity = vector._capacity;
-            _memory = new T[_capacity];
-
+            _memory = new T[_capacity];     // 새 메모리 할당
+            
+            // vector1 <- vector2 내용 복사
             for (unsigned i = 0; i < _size; ++i)
             {
                 _memory[i] = vector._memory[i];
@@ -74,32 +76,36 @@ public:
 
     // vector1 + vector2 수행시 두 벡터가 연결된 새로운 벡터를 리턴하는 연산자 +
     Vector<T> operator+(const Vector<T> &vector) const {
-        Vector<T> res(_size + vector._size);
+        Vector<T> tmp(_size + vector._size);
+        // tmp <- vector1 복사
         for (unsigned i = 0; i < _size; ++i)
         {
-            res._memory[i] = _memory[i];
+            tmp._memory[i] = _memory[i];
         }
+        // tmp(vector1) 끝부터 vector2 복사
         for (unsigned i = 0; i < vector._size; ++i)
         {
-            res._memory[_size + i] = vector._memory[i];
+            tmp._memory[_size + i] = vector._memory[i];
         }
-        res._size = _size + vector._size;
+        tmp._size = _size + vector._size;
 
-        return res;
+        return tmp;
     }
 
     // vector1 += vector2 수행 시 vector1 뒤에 vector2 연결되는 연산자 +=
     Vector<T> &operator+=(const Vector<T> &vector) {
-        unsigned new_size = _size + vector._size;
-        if (new_size > _capacity)
+        unsigned newSize = _size + vector._size;
+        // 기존 크기가 모자를 시
+        if (newSize > _capacity)
         {
-            reallocate(new_size);
+            reallocate(newSize);        // 메모리 재할당
         }
+        // vector1 끝부터 vector2 복사
         for (unsigned i = 0; i < vector._size; ++i)
         {
             _memory[_size + i] = vector._memory[i];
         }
-        _size = new_size;
+        _size = newSize;
 
         return *this;
     }
@@ -107,10 +113,12 @@ public:
     // vector1 == vector2 수행 시 vector1과 vector2의 모든 값이 
     // 같은지 아닌지를 판별하는 연산자 ==
     bool operator==(const Vector<T> &vector) const {
+        // 크기가 다를 시 다른 벡터
         if (_size != vector._size)
         {
             return false;
         }
+        // 인덱스별 동등성 비교
         for (unsigned i = 0; i < _size; ++i)
         {
             if (_memory[i] != vector._memory[i])
@@ -126,32 +134,7 @@ public:
     bool operator!=(const Vector<T> &vector) const {
         return !(*this == vector);
     }
-/*
-    // vector1 > vector2
-    bool operator>(const Vector<T>& vector) const {
-        for (unsigned i = 0; i < _size && i < vector._size; ++i)
-        {
-            if (_memory[i] > vector._memory[i]) return true;
-            if (_memory[i] < vector._memory[i]) return false;
-        }
-        return _size > vector._size;
-    }
 
-    // vector1 >= vector
-    bool operator>=(const Vector<T>& vector) const {
-        return *this > vector || *this == vector;
-    }
-
-    // vector1 < vector2
-    bool operator<(const Vector<T>& vector) const {
-        return !(*this >= vector);
-    }
-
-    // vector1 <= vector2
-    bool operator<=(const Vector<T>& vector) const {
-        return !(*this > vector);
-    }
-*/
     // 출력 스트림으로 vector를 출력하는 프렌드 함수를 정의할 것
     friend std::ostream &operator<<(std::ostream &out, const Vector<T> &vector) {
         // 템플릿 클래스의 경우는 프렌드 함수를 여기에 정의해야 함
@@ -160,6 +143,7 @@ public:
         for (unsigned i = 0; i < vector._size; ++i)
         {
             out << vector._memory[i];
+            // _size - 1번째까지만 쉼표 출력
             if (i < vector._size - 1)
                 out << ", ";
             else
